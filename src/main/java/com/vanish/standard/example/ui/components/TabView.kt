@@ -12,29 +12,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vanish.standard.example.ui.enum.TabItem
 import com.vanish.standard.staffstart.app.domain.model.SnapPlayFilterParams
 import com.vanish.standard.staffstart.app.view.Scene
 import com.vanish.standard.staffstart.app.view.StaffStartUI
 import com.vanish.standard.staffstart.app.view.StaffStartUIConfiguration
-import com.vanish.standard.staffstart.tracking.StaffStartTracking
 import com.vanish.standard.staffstart.core.domain.enum.ContentType
+import com.vanish.standard.staffstart.tracking.StaffStartTracking
 import com.vanish.standard.staffstart.tracking.domain.model.PageViewParams
 import kotlinx.coroutines.launch
 
+class TabViewModel : ViewModel()
+
 @Composable
-fun TabView(modifier: Modifier = Modifier) {
+fun TabView(
+    modifier: Modifier = Modifier,
+    viewModel: TabViewModel = viewModel()
+) {
     val tabs = listOf(TabItem.PRODUCT, TabItem.SNAP_PLAY, TabItem.STAFF)
-    var selectedTab by remember { mutableStateOf(TabItem.PRODUCT) }
+    var selectedTab by rememberSaveable { mutableStateOf(TabItem.PRODUCT) }
     var baseProductCode by remember { mutableStateOf<String?>(null) }
-    val coroutineScope = rememberCoroutineScope()
 
     StaffStartUI.Configure(
         StaffStartUIConfiguration(
@@ -43,21 +50,21 @@ fun TabView(modifier: Modifier = Modifier) {
                 selectedTab = TabItem.PRODUCT
             },
             onShowCoordinateDetail = { snapPlayId ->
-                coroutineScope.launch {
+                viewModel.viewModelScope.launch {
                     StaffStartTracking.trackPageView(
                         PageViewParams(
                             contentId = snapPlayId,
                             userId = null,
-                            contentType = ContentType.COORDINATE
-                        )
+                            contentType = ContentType.COORDINATE,
+                        ),
                     )
                 }
-            }
-        )
+            },
+        ),
     )
 
     Box(
-        modifier.fillMaxSize()
+        modifier.fillMaxSize(),
     ) {
         Column {
             TabRow(selectedTabIndex = tabs.indexOf(selectedTab)) {
@@ -65,7 +72,7 @@ fun TabView(modifier: Modifier = Modifier) {
                     Tab(
                         selected = selectedTab == tab,
                         onClick = { selectedTab = tab },
-                        text = { Text(tab.displayName) }
+                        text = { Text(tab.displayName) },
                     )
                 }
             }
@@ -83,9 +90,9 @@ fun TabView(modifier: Modifier = Modifier) {
                             selectedTab = TabItem.SNAP_PLAY
                             StaffStartUI.navigateToSnapPlayList(
                                 navController,
-                                snapPlayFilterParams = SnapPlayFilterParams(baseProductCode = baseProductCode)
+                                snapPlayFilterParams = SnapPlayFilterParams(baseProductCode = baseProductCode),
                             )
-                        }
+                        },
                     )
                 }
 
@@ -135,16 +142,17 @@ fun ProductTab(
     onNavigateToSnapPlayList: () -> Unit
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+        contentAlignment = Alignment.Center,
     ) {
         Column {
             Text(
                 text = "商品情報を表示する画面です。",
                 style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
             // SnapPlayBlockパーツを使って商品情報を表示
             StaffStartUI.SnapPlayBlock(
@@ -155,7 +163,7 @@ fun ProductTab(
                 onTapReadMore = { productCode ->
                     // TODO: productCodeを使ってSNAP PLAY一覧に遷移すること
                     onNavigateToSnapPlayList()
-                }
+                },
             )
         }
     }
@@ -164,9 +172,10 @@ fun ProductTab(
 @Composable
 fun CoordinateTab() {
     Box(
-        modifier = Modifier
-            .fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier =
+            Modifier
+                .fillMaxSize(),
+        contentAlignment = Alignment.Center,
     ) {
         StaffStartUI.SnapPlayNavigation()
     }
@@ -176,9 +185,10 @@ fun CoordinateTab() {
 @Composable
 fun StaffTab() {
     Box(
-        modifier = Modifier
-            .fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier =
+            Modifier
+                .fillMaxSize(),
+        contentAlignment = Alignment.Center,
     ) {
         StaffStartUI.StaffNavigation()
     }

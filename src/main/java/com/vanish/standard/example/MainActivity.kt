@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
+import com.vanish.standard.example.ui.components.NavView
 import com.vanish.standard.example.ui.components.TabView
 import com.vanish.standard.example.ui.theme.StaffstartandroidsdkTheme
 import com.vanish.standard.staffstart.core.framework.config.StaffStart
@@ -16,8 +17,9 @@ import com.vanish.standard.staffstart.core.framework.config.StaffStartConfigurat
 import com.vanish.standard.staffstart.tracking.framework.config.tracking
 import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
+private const val UNIT_SCREEN_FLAG = true
 
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initializeStaffStartSDK()
@@ -25,20 +27,25 @@ class MainActivity : ComponentActivity() {
         setContent {
             StaffstartandroidsdkTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    TabView(
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    if (UNIT_SCREEN_FLAG) {
+                        NavView(modifier = Modifier.padding(innerPadding))
+                    } else {
+                        TabView(
+                            modifier = Modifier.padding(innerPadding),
+                        )
+                    }
                 }
             }
         }
     }
 
     private fun initializeStaffStartSDK() {
-        val staffStartConfiguration = StaffStartConfiguration(
-            merchantId = "Y75tLWJ7X2kWeke4Tk9UwUEcdKhAnKZp",
-            api = "https://test.staff-start.com",
-            trackingApi = "https://test-analytics.staff-start.com"
-        )
+        val staffStartConfiguration =
+            StaffStartConfiguration(
+                merchantId = "YOUR_MERCHANT_ID",
+                api = "ENV_API_URL",
+                trackingApi = "ENV_TRACKING_API_URL",
+            )
         lifecycleScope.launch {
             StaffStart.Core.initialize(staffStartConfiguration)
             StaffStart.tracking.initialize(applicationContext)
@@ -47,6 +54,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        // TODO 利用者に提供するclearのIFの整理
+        // 何単位で提供するか
         StaffStart.Core.close()
     }
 }
