@@ -8,8 +8,9 @@ import io.kotest.matchers.shouldBe
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
-class ExampleUnitTest : FreeSpec({
-    "addition_isCorrect" {
-        2 + 2 shouldBe 4
-    }
-})
+class ExampleUnitTest :
+    FreeSpec({
+        "addition_isCorrect" {
+            2 + 2 shouldBe 4
+        }
+    })
