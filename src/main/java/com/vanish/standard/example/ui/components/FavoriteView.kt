@@ -19,13 +19,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.vanish.standard.example.LocalExampleViewModel
 import com.vanish.standard.example.ui.enum.FavoriteTab
-import com.vanish.standard.staffstart.app.domain.model.SnapPlayFilterParams
 import com.vanish.standard.staffstart.app.view.StaffStartFavoriteSnapPlayListScreen
 import com.vanish.standard.staffstart.app.view.StaffStartFavoriteStaffListScreen
 import com.vanish.standard.staffstart.app.view.StaffStartSnapPlayDetailScreen
 import com.vanish.standard.staffstart.app.view.StaffStartSnapPlayListScreen
 import com.vanish.standard.staffstart.app.view.StaffStartStaffDetailScreen
 import com.vanish.standard.staffstart.app.view.StaffStartStaffListScreen
+import com.vanish.standard.staffstart.app.viewmodel.SnapPlaySearchConditionRouteParams
+import com.vanish.standard.staffstart.app.viewmodel.StaffSearchConditionRouteParams
 
 @Composable
 fun FavoriteView(
@@ -90,20 +91,21 @@ fun FavoriteView(
                     navController.navigate(PageType.SSSnapPlayDetail.withArgs(snapPlayId.toString()))
                 },
                 onTapReadMore = { baseProductCode ->
-                    val path =
-                        baseProductCode?.let {
-                            PageType.SSSnapPlayList.withQueryArgs(mapOf("baseProductCode" to it))
-                        } ?: PageType.SSSnapPlayList.path
+                    val snapPlaySearchConditionRouteParams = SnapPlaySearchConditionRouteParams(baseProductCode = baseProductCode)
+                    val path = PageType.SSSnapPlayList.withQueryString(snapPlaySearchConditionRouteParams.toQueryString())
                     navController.navigate(path)
+                },
+                onFavoriteAttemptWithoutLogin = {
+                    exampleViewModel.showNeedLoginAlert()
                 },
             )
         }
 
         composable(PageType.SSSnapPlayList.path) { backStackEntry ->
-            val snapPlayFilterParams = SnapPlayFilterParams.from(backStackEntry)
+            val snapPlaySearchConditionRouteParams = SnapPlaySearchConditionRouteParams.fromBackStackEntry(backStackEntry)
 
             StaffStartSnapPlayListScreen(
-                snapPlayFilterParams,
+                snapPlaySearchConditionRouteParams,
                 onTapSnapPlay = { snapPlayId ->
                     navController.navigate(PageType.SSSnapPlayDetail.withArgs(snapPlayId.toString()))
                 },
@@ -115,7 +117,9 @@ fun FavoriteView(
         }
 
         composable(PageType.SSStaffList.path) { backStackEntry ->
+            val staffSearchConditionRouteParams = StaffSearchConditionRouteParams.fromBackStackEntry(backStackEntry)
             StaffStartStaffListScreen(
+                staffSearchConditionRouteParams,
                 onTapStaff = { staffId ->
                     navController.navigate(PageType.SSStaffDetail.withArgs(staffId.toString()))
                 },
@@ -135,7 +139,8 @@ fun FavoriteView(
                         navController.navigate(PageType.SSSnapPlayDetail.withArgs(snapPlayId.toString()))
                     },
                     onTapSnapPlayFilter = {
-                        navController.navigate(PageType.SSSnapPlayList.withQueryArgs(it.toMap()))
+                        val snapPlaySearchConditionRouteParams = it.toSnapPlaySearchConditionRouteParams()
+                        navController.navigate(PageType.SSSnapPlayList.withQueryString(snapPlaySearchConditionRouteParams.toQueryString()))
                     },
                     onFavoriteAttemptWithoutLogin = {
                         // TODO ログインしていないのにお気に入りしようとした際のcallbackを実装してください
@@ -156,7 +161,7 @@ fun FavoriteView(
                         navController.navigate(PageType.SSSnapPlayDetail.withArgs(it.toString()))
                     },
                     onTapSnapPlayFilter = {
-                        navController.navigate(PageType.SSSnapPlayList.withQueryArgs(it.toMap()))
+                        navController.navigate(PageType.SSSnapPlayList.withQueryString(it.toSnapPlaySearchConditionRouteParams().toQueryString()))
                     },
                     onTapProductItem = {
                         navController.navigate(PageType.ProductDetail.withArgs(it))

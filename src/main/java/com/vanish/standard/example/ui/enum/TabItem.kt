@@ -5,5 +5,6 @@ enum class TabItem(
 ) {
     PRODUCT("商品"),
     SNAP_PLAY("コーディネート"),
-    STAFF("スタッフ")
+    STAFF("スタッフ"),
+    BRAND("ブランド")
 }

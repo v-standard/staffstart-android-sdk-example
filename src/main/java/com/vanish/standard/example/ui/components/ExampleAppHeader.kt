@@ -1,7 +1,7 @@
 package com.vanish.standard.example.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -9,8 +9,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,17 +21,19 @@ import com.vanish.standard.example.LocalExampleViewModel
 
 @Composable
 fun ExampleAppHeader() {
-    Row(
-        modifier =
-            Modifier
-                .background(MaterialTheme.colorScheme.onBackground)
-                .fillMaxWidth()
-                .padding(10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text("YourApp", color = MaterialTheme.colorScheme.background)
-        LoginToggleButton()
+    Column {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text("YourApp")
+            LoginToggleButton()
+        }
+        HorizontalDivider()
     }
 }
 
@@ -42,7 +44,7 @@ private fun LoginToggleButton() {
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         if (isLoggedIn) {
-            Text("ログイン中", color = MaterialTheme.colorScheme.background, modifier = Modifier.padding(end = 10.dp))
+            Text("ログイン中", modifier = Modifier.padding(end = 10.dp))
         }
         Button(
             onClick = {

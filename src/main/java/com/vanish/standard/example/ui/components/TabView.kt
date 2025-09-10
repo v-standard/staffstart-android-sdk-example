@@ -22,11 +22,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.vanish.standard.example.LocalExampleViewModel
 import com.vanish.standard.example.ui.enum.TabItem
-import com.vanish.standard.staffstart.app.domain.model.SnapPlayFilterParams
 import com.vanish.standard.staffstart.app.view.Scene
 import com.vanish.standard.staffstart.app.view.StaffStartUI
 import com.vanish.standard.staffstart.app.view.StaffStartUIConfiguration
+import com.vanish.standard.staffstart.app.viewmodel.SnapPlaySearchConditionRouteParams
 import com.vanish.standard.staffstart.core.domain.enum.ContentType
 import com.vanish.standard.staffstart.tracking.StaffStartTracking
 import com.vanish.standard.staffstart.tracking.domain.model.PageViewParams
@@ -39,9 +40,10 @@ fun TabView(
     modifier: Modifier = Modifier,
     viewModel: TabViewModel = viewModel()
 ) {
-    val tabs = listOf(TabItem.PRODUCT, TabItem.SNAP_PLAY, TabItem.STAFF)
-    var selectedTab by rememberSaveable { mutableStateOf(TabItem.PRODUCT) }
+    val tabs = listOf(TabItem.PRODUCT, TabItem.SNAP_PLAY, TabItem.STAFF, TabItem.BRAND)
+    var selectedTab by rememberSaveable { mutableStateOf(TabItem.BRAND) }
     var baseProductCode by remember { mutableStateOf<String?>(null) }
+    var labelId by remember { mutableStateOf<String>("152") }
 
     StaffStartUI.Configure(
         StaffStartUIConfiguration(
@@ -86,11 +88,11 @@ fun TabView(
                             selectedTab = TabItem.SNAP_PLAY // タブを切り替え
                             StaffStartUI.navigateToSnapPlayDetail(navController, snapPlayID)
                         },
-                        onNavigateToSnapPlayList = {
+                        onNavigateToSnapPlayList = { baseProductCode ->
                             selectedTab = TabItem.SNAP_PLAY
                             StaffStartUI.navigateToSnapPlayList(
                                 navController,
-                                snapPlayFilterParams = SnapPlayFilterParams(baseProductCode = baseProductCode),
+                                snapPlaySearchConditionRouteParams = SnapPlaySearchConditionRouteParams(baseProductCode = baseProductCode),
                             )
                         },
                     )
@@ -130,6 +132,32 @@ fun TabView(
                 TabItem.STAFF -> {
                     StaffTab()
                 }
+
+                TabItem.BRAND -> {
+                    val snapPlayNavController = StaffStartUI.getNavController(Scene.SNAP_PLAY)
+                    val staffNavController = StaffStartUI.getNavController(Scene.STAFF)
+                    BrandScreen(
+                        labelId.toInt(),
+                        onTapSnapPlay = { snapPlayId ->
+                            selectedTab = TabItem.SNAP_PLAY
+                            StaffStartUI.navigateToSnapPlayDetail(snapPlayNavController, snapPlayId.toString())
+                        },
+                        onTapReadMoreSnapPlay = { brandSnapPlaysBlockCondition ->
+                            val snapPlaySearchConditionRouteParams = brandSnapPlaysBlockCondition.toSnapPlaySearchConditionRouteParams()
+                            selectedTab = TabItem.SNAP_PLAY
+                            StaffStartUI.navigateToSnapPlayList(snapPlayNavController, snapPlaySearchConditionRouteParams)
+                        },
+                        onTapStaff = { userId ->
+                            selectedTab = TabItem.STAFF
+                            StaffStartUI.navigateToStaffDetail(staffNavController, userId.toString())
+                        },
+                        onTapReadMoreStaff = { brandStaffsBlockCondition ->
+                            val searchConditionRouteParams = brandStaffsBlockCondition.toStaffSearchConditionRouteParams()
+                            selectedTab = TabItem.STAFF
+                            StaffStartUI.navigateToStaffList(staffNavController, searchConditionRouteParams)
+                        },
+                    )
+                }
             }
         }
     }
@@ -139,7 +167,7 @@ fun TabView(
 fun ProductTab(
     baseProductId: String?,
     onNavigateToSnapPlayDetail: (String) -> Unit,
-    onNavigateToSnapPlayList: () -> Unit
+    onNavigateToSnapPlayList: (String?) -> Unit
 ) {
     Box(
         modifier =
@@ -160,9 +188,8 @@ fun ProductTab(
                 onTapSnapPlayDetail = { snapPlayID ->
                     onNavigateToSnapPlayDetail(snapPlayID.toString())
                 },
-                onTapReadMore = { productCode ->
-                    // TODO: productCodeを使ってSNAP PLAY一覧に遷移すること
-                    onNavigateToSnapPlayList()
+                onTapReadMore = { baseProductCode ->
+                    onNavigateToSnapPlayList(baseProductCode)
                 },
             )
         }
@@ -171,26 +198,34 @@ fun ProductTab(
 
 @Composable
 fun CoordinateTab() {
+    val exampleViewModel = LocalExampleViewModel.current
     Box(
         modifier =
             Modifier
                 .fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        StaffStartUI.SnapPlayNavigation()
+        StaffStartUI.SnapPlayNavigation(onFavoriteAttemptWithoutLogin = {
+            // ログインしていない状態で「お気に入り」しようとしたときの処理を書く
+            exampleViewModel.showNeedLoginAlert()
+        })
     }
 }
 
 // スタッフタブのコンテンツ
 @Composable
 fun StaffTab() {
+    val exampleViewModel = LocalExampleViewModel.current
     Box(
         modifier =
             Modifier
                 .fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        StaffStartUI.StaffNavigation()
+        StaffStartUI.StaffNavigation(onFavoriteAttemptWithoutLogin = {
+            // ログインしていない状態で「お気に入り」しようとしたときの処理を書く
+            exampleViewModel.showNeedLoginAlert()
+        })
     }
 }
 

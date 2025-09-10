@@ -8,6 +8,7 @@ enum class PageType(
 ) {
     Top("Top"),
     ProductDetail("ProductDetail/{baseProductCode}"),
+    BrandPage("Brand/{labelId}"),
     SSSnapPlayDetail("SSSnapPlayDetail/{id}"),
     SSSnapPlayList("SSSnapPlayList"),
     SSStaffDetail("SSStaffDetail/{id}"),
@@ -21,17 +22,11 @@ enum class PageType(
         return result
     }
 
-    fun withQueryArgs(query: Map<String, Any>): String {
-        // クエリパラメータが空の場合は元のURLを返す
-        if (query.isEmpty()) return path
+    fun withQueryString(queryString: String): String {
+        // 空の場合はそのまま返す
+        if (queryString.isBlank()) return path
 
-        // クエリパラメータを文字列に変換
-        val queryString =
-            query.entries.joinToString("&") { (key, value) ->
-                "$key=$value"
-            }
-
-        // URLにクエリパラメータを追加
+        // URLにクエリ文字列を追加
         return if (path.contains("?")) {
             "$path&$queryString"
         } else {

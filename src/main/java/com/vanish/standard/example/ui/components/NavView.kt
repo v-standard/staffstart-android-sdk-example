@@ -9,13 +9,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.vanish.standard.example.LocalExampleViewModel
-import com.vanish.standard.staffstart.app.domain.model.SnapPlayFilterParams
 import com.vanish.standard.staffstart.app.view.StaffStartSnapPlayDetailScreen
 import com.vanish.standard.staffstart.app.view.StaffStartSnapPlayListScreen
 import com.vanish.standard.staffstart.app.view.StaffStartStaffDetailScreen
 import com.vanish.standard.staffstart.app.view.StaffStartStaffListScreen
 import com.vanish.standard.staffstart.app.view.StaffStartUI
 import com.vanish.standard.staffstart.app.view.StaffStartUIConfiguration
+import com.vanish.standard.staffstart.app.viewmodel.SnapPlaySearchConditionRouteParams
+import com.vanish.standard.staffstart.app.viewmodel.StaffSearchConditionRouteParams
 import com.vanish.standard.staffstart.core.domain.enum.ContentType
 import com.vanish.standard.staffstart.core.framework.util.PlatformLogger
 import com.vanish.standard.staffstart.tracking.StaffStartTracking
@@ -59,12 +60,15 @@ fun NavView(
     ) {
         composable(PageType.Top.path) {
             TopScreen(onClickToDetailPage = {
-                val baseProductCode = "UC17S0051060200" // or null. nullであれば絞り込まない
+                val baseProductCode = "1612804606-0000" // or null. nullであれば絞り込まない
                 navController.navigate(PageType.ProductDetail.withArgs(baseProductCode))
             }, onClickToStaffListPage = {
                 navController.navigate(PageType.SSStaffList.path)
             }, onClickToSnapPlayListPage = {
                 navController.navigate(PageType.SSSnapPlayList.path)
+            }, onClickBrandPage = {
+                val labelId = "152" // 3Coins
+                navController.navigate(PageType.BrandPage.withArgs(labelId))
             })
         }
 
@@ -73,18 +77,41 @@ fun NavView(
             ProductScreen(baseProductCode, onTapSnapPlayDetail = { snapPlayId ->
                 navController.navigate(PageType.SSSnapPlayDetail.withArgs(snapPlayId.toString()))
             }, onTapReadMore = { baseProductCode ->
-                val path =
-                    baseProductCode?.let {
-                        PageType.SSSnapPlayList.withQueryArgs(mapOf("baseProductCode" to it))
-                    } ?: PageType.SSSnapPlayList.path
+                val snapPlaySearchConditionRouteParams = SnapPlaySearchConditionRouteParams(baseProductCode = baseProductCode)
+                val path = PageType.SSSnapPlayList.withQueryString(snapPlaySearchConditionRouteParams.toQueryString())
                 navController.navigate(path)
+            }, onFavoriteAttemptWithoutLogin = {
+                // ログインしていないのにお気に入りしようとした際のcallbackを実装してください
+                exampleViewModel.showNeedLoginAlert()
             })
         }
 
-        composable(PageType.SSSnapPlayList.path) { backStackEntry ->
-            val snapPlayFilterParams = SnapPlayFilterParams.from(backStackEntry)
+        composable(PageType.BrandPage.path) { backStackEntry ->
+            val labelId = backStackEntry.arguments?.getString("labelId")?.toIntOrNull() ?: return@composable Text("Not Found labelId")
 
-            StaffStartSnapPlayListScreen(snapPlayFilterParams, onTapSnapPlay = { snapPlayId ->
+            BrandScreen(
+                labelId,
+                onTapSnapPlay = { snapPlayId ->
+                    navController.navigate(PageType.SSSnapPlayDetail.withArgs(snapPlayId.toString()))
+                },
+                onTapReadMoreSnapPlay = { brandSnapPlaysBlockCondition ->
+                    val snapPlaySearchConditionRouteParams = brandSnapPlaysBlockCondition.toSnapPlaySearchConditionRouteParams()
+                    navController.navigate(PageType.SSSnapPlayList.withQueryString(snapPlaySearchConditionRouteParams.toQueryString()))
+                },
+                onTapStaff = { userId ->
+                    navController.navigate(PageType.SSStaffDetail.withArgs(userId.toString()))
+                },
+                onTapReadMoreStaff = { brandStaffsBlockCondition ->
+                    val staffSearchConditionRouteParams = brandStaffsBlockCondition.toStaffSearchConditionRouteParams()
+                    navController.navigate(PageType.SSStaffList.withQueryString(staffSearchConditionRouteParams.toQueryString()))
+                },
+            )
+        }
+
+        composable(PageType.SSSnapPlayList.path) { backStackEntry ->
+            val snapPlaySearchConditionRouteParams = SnapPlaySearchConditionRouteParams.fromBackStackEntry(backStackEntry)
+
+            StaffStartSnapPlayListScreen(snapPlaySearchConditionRouteParams, onTapSnapPlay = { snapPlayId ->
                 navController.navigate(PageType.SSSnapPlayDetail.withArgs(snapPlayId.toString()))
             }, onFavoriteAttemptWithoutLogin = {
                 // ログインしていないのにお気に入りしようとした際のcallbackを実装してください
@@ -93,7 +120,8 @@ fun NavView(
         }
 
         composable(PageType.SSStaffList.path) { backStackEntry ->
-            StaffStartStaffListScreen(onTapStaff = { staffId ->
+            val staffSearchConditionRouteParams = StaffSearchConditionRouteParams.fromBackStackEntry(backStackEntry)
+            StaffStartStaffListScreen(staffSearchConditionRouteParams, onTapStaff = { staffId ->
                 navController.navigate(PageType.SSStaffDetail.withArgs(staffId.toString()))
             }, onFavoriteAttemptWithoutLogin = {
                 // ログインしていないのにお気に入りしようとした際のcallbackを実装してください
@@ -107,7 +135,8 @@ fun NavView(
                 StaffStartStaffDetailScreen(staffId, onTapSnapPlay = { snapPlayId ->
                     navController.navigate(PageType.SSSnapPlayDetail.withArgs(snapPlayId.toString()))
                 }, onTapSnapPlayFilter = {
-                    navController.navigate(PageType.SSSnapPlayList.withQueryArgs(it.toMap()))
+                    val snapPlaySearchConditionRouteParams = it.toSnapPlaySearchConditionRouteParams()
+                    navController.navigate(PageType.SSSnapPlayList.withQueryString(snapPlaySearchConditionRouteParams.toQueryString()))
                 }, onFavoriteAttemptWithoutLogin = {
                     // ログインしていないのにお気に入りしようとした際のcallbackを実装してください
                     exampleViewModel.showNeedLoginAlert()
@@ -126,7 +155,8 @@ fun NavView(
                         navController.navigate(PageType.SSSnapPlayDetail.withArgs(it.toString()))
                     },
                     onTapSnapPlayFilter = {
-                        navController.navigate(PageType.SSSnapPlayList.withQueryArgs(it.toMap()))
+                        val snapPlaySearchConditionRouteParams = it.toSnapPlaySearchConditionRouteParams()
+                        navController.navigate(PageType.SSSnapPlayList.withQueryString(snapPlaySearchConditionRouteParams.toQueryString()))
                     },
                     onTapProductItem = {
                         navController.navigate(PageType.ProductDetail.withArgs(it))

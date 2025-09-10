@@ -29,7 +29,7 @@ import com.vanish.standard.example.ui.components.FavoriteView
 import com.vanish.standard.example.ui.components.NavView
 import com.vanish.standard.example.ui.components.TabView
 import com.vanish.standard.example.ui.enum.MainTab
-import com.vanish.standard.example.ui.theme.StaffstartandroidsdkTheme
+import com.vanish.standard.example.ui.theme.ExampleAppTheme
 import com.vanish.standard.staffstart.core.framework.config.StaffStart
 import com.vanish.standard.staffstart.core.framework.config.StaffStartConfiguration
 import com.vanish.standard.staffstart.tracking.framework.config.tracking
@@ -45,7 +45,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             val exampleViewModel: ExampleViewModel = viewModel()
             CompositionLocalProvider(LocalExampleViewModel provides exampleViewModel) {
-                StaffstartandroidsdkTheme {
+                ExampleAppTheme {
+                    // ← 利用者様Appでお使いのテーマがある場合
                     var selectedTab by rememberSaveable { mutableStateOf(MainTab.SNAP) }
 
                     val isShowAlertLogin = exampleViewModel.isShowLoginAlert.collectAsState().value
@@ -117,8 +118,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // TODO 利用者に提供するclearのIFの整理
-        // 何単位で提供するか
         StaffStart.Core.close()
     }
 }
