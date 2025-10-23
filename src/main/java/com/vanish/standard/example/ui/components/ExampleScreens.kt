@@ -92,7 +92,7 @@ fun ProductScreen(
 
 @Composable
 fun BrandScreen(
-    labelId: Int,
+    labelId: Int?,
     onTapSnapPlay: (snapPlayId: Int) -> Unit,
     onTapReadMoreSnapPlay: (brandSnapPlaysBlockCondition: BrandSnapPlaysBlockCondition) -> Unit,
     onTapStaff: (userId: Int) -> Unit,
@@ -122,6 +122,18 @@ fun BrandScreen(
             Text("今話題の原宿系ファッションブランド")
             Text("私たちは小売・サービス業の“人の価値”を再定義するSaaSプロダクト「STAFF START」を展開しています。店舗スタッフの接客力をオンラインでも発揮できる仕組みなど、業界構造や働き方に新しい常識を生み出し続けているスタートアップです。")
         }
+
+        BrandSnapPlaysBlockSample(
+            brandSnapPlaysBlockCondition =
+                BrandSnapPlaysBlockCondition(
+                    labelId = null,
+                ),
+            headerTitle = "全てのコーデ！",
+            title = "たくさん表示されます",
+            moreLabel = "もっとたくさん >",
+            onTapSnapPlay = onTapSnapPlay,
+            onTapReadMoreSnapPlay = onTapReadMoreSnapPlay,
+        )
 
         BrandSnapPlaysBlockSample(
             brandSnapPlaysBlockCondition =
@@ -163,6 +175,22 @@ fun BrandScreen(
             Text("ファッションのスペシャリスト")
             Text("スタッフへのご相談はお気軽に")
         }
+
+        BrandStaffsBlockSample(
+            brandStaffsBlockConditions =
+                BrandStaffsBlockConditions(
+                    labelId = null,
+                ),
+            headerTitle = "全員",
+            title = "全てのスタッフ",
+            moreLabel = "全員を見る",
+            onTapStaff = onTapStaff,
+            onTapReadMoreStaff = onTapReadMoreStaff,
+            onFavoriteAttemptWithoutLogin = {
+                // TODO ログインしていないのにお気に入りしようとした際のcallbackを実装してください
+                exampleViewModel.showNeedLoginAlert()
+            },
+        )
 
         BrandStaffsBlockSample(
             brandStaffsBlockConditions =
