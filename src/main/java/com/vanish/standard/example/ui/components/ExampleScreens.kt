@@ -64,6 +64,7 @@ fun TopScreen(
 
 @Composable
 fun ProductScreen(
+    useDarkTheme: Boolean,
     baseProductCode: String? = null,
     onTapSnapPlayDetail: (snapPlayId: Int) -> Unit,
     onTapReadMore: (baseProductCode: String?) -> Unit,
@@ -82,6 +83,7 @@ fun ProductScreen(
         Text("とてもおしゃれなスウェットです。.....")
         Spacer(modifier = Modifier.height(40.dp))
         StaffStartBaseProductSnapPlaysBlock(
+            useDarkTheme = useDarkTheme,
             baseProductCode = baseProductCode,
             onTapSnapPlayDetail = onTapSnapPlayDetail,
             onTapReadMore = onTapReadMore,
@@ -93,6 +95,7 @@ fun ProductScreen(
 @Composable
 fun BrandScreen(
     labelId: Int?,
+    useDarkTheme: Boolean,
     onTapSnapPlay: (snapPlayId: Int) -> Unit,
     onTapReadMoreSnapPlay: (brandSnapPlaysBlockCondition: BrandSnapPlaysBlockCondition) -> Unit,
     onTapStaff: (userId: Int) -> Unit,
@@ -131,6 +134,7 @@ fun BrandScreen(
             headerTitle = "全てのコーデ！",
             title = "たくさん表示されます",
             moreLabel = "もっとたくさん >",
+            useDarkTheme = useDarkTheme,
             onTapSnapPlay = onTapSnapPlay,
             onTapReadMoreSnapPlay = onTapReadMoreSnapPlay,
         )
@@ -146,6 +150,7 @@ fun BrandScreen(
             headerTitle = "夏のメンズ人気コーデ！",
             title = "夏の爽やか",
             moreLabel = "もっと夏を >",
+            useDarkTheme = useDarkTheme,
             onTapSnapPlay = onTapSnapPlay,
             onTapReadMoreSnapPlay = onTapReadMoreSnapPlay,
         )
@@ -160,6 +165,7 @@ fun BrandScreen(
             headerTitle = "夏の女性コーデ",
             title = "最新Cute",
             moreLabel = "もっと新着をみる >",
+            useDarkTheme = useDarkTheme,
             onTapSnapPlay = onTapSnapPlay,
             onTapReadMoreSnapPlay = onTapReadMoreSnapPlay,
         )
@@ -185,6 +191,7 @@ fun BrandScreen(
             title = "全てのスタッフ",
             moreLabel = "全員を見る",
             onTapStaff = onTapStaff,
+            useDarkTheme = useDarkTheme,
             onTapReadMoreStaff = onTapReadMoreStaff,
             onFavoriteAttemptWithoutLogin = {
                 // TODO ログインしていないのにお気に入りしようとした際のcallbackを実装してください
@@ -202,6 +209,7 @@ fun BrandScreen(
             headerTitle = "男性スタッフ",
             title = "人気の男性",
             moreLabel = "もっと見たい",
+            useDarkTheme = useDarkTheme,
             onTapStaff = onTapStaff,
             onTapReadMoreStaff = onTapReadMoreStaff,
             onFavoriteAttemptWithoutLogin = {
@@ -220,6 +228,7 @@ fun BrandScreen(
             headerTitle = "女性スタッフ",
             title = "ニューカマー",
             moreLabel = "もっと新人を見る",
+            useDarkTheme = useDarkTheme,
             onTapStaff = onTapStaff,
             onTapReadMoreStaff = onTapReadMoreStaff,
             onFavoriteAttemptWithoutLogin = {
@@ -250,6 +259,7 @@ private fun BrandSnapPlaysBlockSample(
     headerTitle: String,
     title: String,
     moreLabel: String,
+    useDarkTheme: Boolean,
     onTapSnapPlay: (snapPlayId: Int) -> Unit,
     onTapReadMoreSnapPlay: (brandSnapPlaysBlockCondition: BrandSnapPlaysBlockCondition) -> Unit,
     onFavoriteAttemptWithoutLogin: () -> Unit = {}
@@ -289,6 +299,7 @@ private fun BrandSnapPlaysBlockSample(
 
         StaffStartBrandSnapPlaysBlock(
             conditions = brandSnapPlaysBlockCondition,
+            useDarkTheme = useDarkTheme,
             onTapSnapPlay = onTapSnapPlay,
             onFavoriteAttemptWithoutLogin = onFavoriteAttemptWithoutLogin,
         )
@@ -301,6 +312,7 @@ private fun BrandStaffsBlockSample(
     headerTitle: String,
     title: String,
     moreLabel: String,
+    useDarkTheme: Boolean,
     onTapStaff: (userId: Int) -> Unit,
     onTapReadMoreStaff: (BrandStaffsBlockConditions) -> Unit,
     onFavoriteAttemptWithoutLogin: () -> Unit = {}
@@ -339,6 +351,7 @@ private fun BrandStaffsBlockSample(
 
         StaffStartBrandStaffsBlock(
             conditions = brandStaffsBlockConditions,
+            useDarkTheme = useDarkTheme,
             onTapStaff = onTapStaff,
             onFavoriteAttemptWithoutLogin = onFavoriteAttemptWithoutLogin,
         )

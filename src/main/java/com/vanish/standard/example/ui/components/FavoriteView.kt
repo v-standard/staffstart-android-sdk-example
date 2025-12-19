@@ -30,7 +30,8 @@ import com.vanish.standard.staffstart.app.viewmodel.StaffSearchConditionRoutePar
 
 @Composable
 fun FavoriteView(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    useDarkTheme: Boolean = false
 ) {
     var selectedTab by rememberSaveable { mutableStateOf(FavoriteTab.COORDINATE) }
 
@@ -60,6 +61,7 @@ fun FavoriteView(
                 when (selectedTab) {
                     FavoriteTab.COORDINATE ->
                         CoordinateView(
+                            useDarkTheme = useDarkTheme,
                             onTapSnapPlay = { snapPlayId ->
                                 navController.navigate(PageType.SSSnapPlayDetail.withArgs(snapPlayId.toString()))
                             },
@@ -86,7 +88,8 @@ fun FavoriteView(
         composable(PageType.ProductDetail.path) { backStackEntry ->
             val baseProductCode = backStackEntry.arguments?.getString("baseProductCode")?.takeUnless { it == NO_VALUE_PARAM }
             ProductScreen(
-                baseProductCode,
+                useDarkTheme = useDarkTheme,
+                baseProductCode = baseProductCode,
                 onTapSnapPlayDetail = { snapPlayId ->
                     navController.navigate(PageType.SSSnapPlayDetail.withArgs(snapPlayId.toString()))
                 },
@@ -184,6 +187,7 @@ fun FavoriteView(
 
 @Composable
 fun CoordinateView(
+    useDarkTheme: Boolean,
     onTapSnapPlay: (Int) -> Unit,
     onFavoriteAttemptWithoutLogin: () -> Unit = {}
 ) {
@@ -192,6 +196,7 @@ fun CoordinateView(
         StaffStartFavoriteSnapPlayListScreen(
             onTapSnapPlay,
             onFavoriteAttemptWithoutLogin,
+            useDarkTheme = useDarkTheme,
         )
     }
 }

@@ -43,9 +43,13 @@ class MainActivity : ComponentActivity() {
         initializeStaffStartSDK()
         enableEdgeToEdge()
         setContent {
+//            val useDarkTheme = isSystemInDarkTheme() // デフォルト: 端末のダークモード設定に合わせる
+//            val useDarkTheme = true // ダークモード固定
+            val useDarkTheme = false // ライトモード 固定 (お使いのアプリがダークモードに対応していない時はこちらを設定してください
+
             val exampleViewModel: ExampleViewModel = viewModel()
             CompositionLocalProvider(LocalExampleViewModel provides exampleViewModel) {
-                ExampleAppTheme {
+                ExampleAppTheme(useDarkTheme = useDarkTheme) {
                     // ← 利用者様Appでお使いのテーマがある場合
                     var selectedTab by rememberSaveable { mutableStateOf(MainTab.SNAP) }
 
@@ -89,11 +93,11 @@ class MainActivity : ComponentActivity() {
                                 when (selectedTab) {
                                     MainTab.SNAP ->
                                         when (UNIT_SCREEN_FLAG) {
-                                            true -> NavView()
-                                            false -> TabView()
+                                            true -> NavView(useDarkTheme = useDarkTheme)
+                                            false -> TabView(useDarkTheme = useDarkTheme)
                                         }
 
-                                    MainTab.FAVORITE -> FavoriteView()
+                                    MainTab.FAVORITE -> FavoriteView(useDarkTheme = useDarkTheme)
                                 }
                             }
                         }

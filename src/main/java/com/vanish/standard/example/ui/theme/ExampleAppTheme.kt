@@ -1,6 +1,5 @@
 package com.vanish.standard.example.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -75,7 +74,7 @@ private val DarkColorScheme =
 
 @Composable
 fun ExampleAppTheme(
-    useDarkTheme: Boolean = isSystemInDarkTheme(),
+    useDarkTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colors = if (useDarkTheme) DarkColorScheme else LightColorScheme
@@ -87,7 +86,7 @@ fun ExampleAppTheme(
 
 @Composable
 fun DefaultAppTheme(
-    useDarkTheme: Boolean = isSystemInDarkTheme(),
+    useDarkTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colors = if (useDarkTheme) darkColorScheme() else lightColorScheme()

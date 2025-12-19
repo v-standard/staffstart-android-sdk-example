@@ -38,6 +38,7 @@ class TabViewModel : ViewModel()
 @Composable
 fun TabView(
     modifier: Modifier = Modifier,
+    useDarkTheme: Boolean = false,
     viewModel: TabViewModel = viewModel()
 ) {
     val tabs = listOf(TabItem.PRODUCT, TabItem.SNAP_PLAY, TabItem.STAFF, TabItem.BRAND)
@@ -99,7 +100,7 @@ fun TabView(
                 }
 
                 TabItem.SNAP_PLAY -> {
-                    CoordinateTab().also {
+                    CoordinateTab(useDarkTheme = useDarkTheme).also {
                         // CV計測タグの例
 //                        coroutineScope.launch(Dispatchers.IO) {
 //                            StaffStartTracking.trackPurchase(
@@ -130,7 +131,7 @@ fun TabView(
                 }
 
                 TabItem.STAFF -> {
-                    StaffTab()
+                    StaffTab(useDarkTheme)
                 }
 
                 TabItem.BRAND -> {
@@ -138,6 +139,7 @@ fun TabView(
                     val staffNavController = StaffStartUI.getNavController(Scene.STAFF)
                     BrandScreen(
                         labelId.toInt(),
+                        useDarkTheme = useDarkTheme,
                         onTapSnapPlay = { snapPlayId ->
                             selectedTab = TabItem.SNAP_PLAY
                             StaffStartUI.navigateToSnapPlayDetail(snapPlayNavController, snapPlayId.toString())
@@ -197,7 +199,7 @@ fun ProductTab(
 }
 
 @Composable
-fun CoordinateTab() {
+fun CoordinateTab(useDarkTheme: Boolean) {
     val exampleViewModel = LocalExampleViewModel.current
     Box(
         modifier =
@@ -205,16 +207,19 @@ fun CoordinateTab() {
                 .fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        StaffStartUI.SnapPlayNavigation(onFavoriteAttemptWithoutLogin = {
-            // ログインしていない状態で「お気に入り」しようとしたときの処理を書く
-            exampleViewModel.showNeedLoginAlert()
-        })
+        StaffStartUI.SnapPlayNavigation(
+            useDarkTheme = useDarkTheme,
+            onFavoriteAttemptWithoutLogin = {
+                // ログインしていない状態で「お気に入り」しようとしたときの処理を書く
+                exampleViewModel.showNeedLoginAlert()
+            },
+        )
     }
 }
 
 // スタッフタブのコンテンツ
 @Composable
-fun StaffTab() {
+fun StaffTab(useDarkTheme: Boolean) {
     val exampleViewModel = LocalExampleViewModel.current
     Box(
         modifier =
@@ -222,10 +227,13 @@ fun StaffTab() {
                 .fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        StaffStartUI.StaffNavigation(onFavoriteAttemptWithoutLogin = {
-            // ログインしていない状態で「お気に入り」しようとしたときの処理を書く
-            exampleViewModel.showNeedLoginAlert()
-        })
+        StaffStartUI.StaffNavigation(
+            useDarkTheme = useDarkTheme,
+            onFavoriteAttemptWithoutLogin = {
+                // ログインしていない状態で「お気に入り」しようとしたときの処理を書く
+                exampleViewModel.showNeedLoginAlert()
+            },
+        )
     }
 }
 
