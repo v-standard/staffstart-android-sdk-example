@@ -1,13 +1,23 @@
 package com.vanish.standard.example.ui.components
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.ui.NavDisplay
+import com.vanish.standard.example.ExampleViewModel
 import com.vanish.standard.example.LocalExampleViewModel
 import com.vanish.standard.staffstart.app.view.StaffStartSnapPlayDetailScreen
 import com.vanish.standard.staffstart.app.view.StaffStartSnapPlayListScreen
@@ -26,21 +36,17 @@ import kotlinx.coroutines.launch
 @Composable
 fun NavView(
     modifier: Modifier = Modifier,
-    useDarkTheme: Boolean = false
+    useDarkTheme: Boolean = false,
+    useNavigation3: Boolean = true
 ) {
-    val navController = rememberNavController()
-
     val coroutineScope = rememberCoroutineScope()
-
-    val exampleViewModel = LocalExampleViewModel.current
-
     StaffStartUI.Configure(
         StaffStartUIConfiguration(
             onTapProductItem = { productCode ->
-                PlatformLogger.d("NavView.onTapProductItem", productCode)
+                PlatformLogger.d("Navigation3View.onTapProductItem", productCode)
             },
             onShowCoordinateDetail = { snapPlayId ->
-                PlatformLogger.d("NavView.onShowCoordinateDetail", snapPlayId.toString())
+                PlatformLogger.d("Navigation3View.onShowCoordinateDetail", snapPlayId.toString())
 
                 coroutineScope.launch {
                     StaffStartTracking.trackPageView(
@@ -54,6 +60,199 @@ fun NavView(
             },
         ),
     )
+
+    if (useNavigation3) {
+        Navigation3View(
+            modifier = modifier,
+            useDarkTheme = useDarkTheme,
+        )
+    } else {
+        NavHostView(
+            modifier = modifier,
+            useDarkTheme = useDarkTheme,
+        )
+    }
+}
+
+@Composable
+private fun Navigation3View(
+    modifier: Modifier = Modifier,
+    useDarkTheme: Boolean = false
+) {
+    val exampleViewModel = LocalExampleViewModel.current
+    val navigationState =
+        rememberNavigationState<ExampleRoute>(
+            startRoute = ExampleRoute.Top,
+            topLevelRoutes = setOf(ExampleRoute.Top),
+        )
+    val navigator = remember { Navigator(navigationState) }
+
+    val entryProvider =
+        entryProvider<ExampleRoute> {
+            exampleGraph(navigator, useDarkTheme, exampleViewModel)
+        }
+
+    NavDisplay(
+        modifier = modifier.fillMaxSize(),
+        entries = navigationState.toEntries(entryProvider),
+        onBack = { navigator.goBack() },
+        transitionSpec = {
+            (slideInHorizontally { it } + fadeIn()) togetherWith
+                    (slideOutHorizontally { -it / 4 } + fadeOut())
+        },
+        popTransitionSpec = {
+            (slideInHorizontally { -it / 4 } + fadeIn()) togetherWith
+                    (slideOutHorizontally { it } + fadeOut())
+        },
+        predictivePopTransitionSpec = { _ ->
+            (slideInHorizontally { -it / 4 } + fadeIn()) togetherWith
+                    (slideOutHorizontally { it } + fadeOut())
+        },
+    )
+}
+
+private fun EntryProviderScope<ExampleRoute>.exampleGraph(
+    navigator: Navigator<ExampleRoute>,
+    useDarkTheme: Boolean,
+    exampleViewModel: ExampleViewModel
+) {
+    entry<ExampleRoute.Top> {
+        TopScreen(
+            onClickToDetailPage = {
+                val baseProductCode = "1612804606-0000"
+                navigator.navigate(ExampleRoute.ProductDetail(baseProductCode))
+            },
+            onClickToStaffListPage = {
+                navigator.navigate(ExampleRoute.SSStaffList())
+            },
+            onClickToSnapPlayListPage = {
+                navigator.navigate(ExampleRoute.SSSnapPlayList())
+            },
+            onClickBrandPage = {
+                val labelId = 152 // 3Coins
+                navigator.navigate(ExampleRoute.BrandPage(labelId))
+            },
+        )
+    }
+
+    entry<ExampleRoute.ProductDetail> { key ->
+        ProductScreen(
+            useDarkTheme = useDarkTheme,
+            baseProductCode = key.baseProductCode,
+            onTapSnapPlayDetail = { snapPlayId ->
+                navigator.navigate(ExampleRoute.SSSnapPlayDetail(snapPlayId.toString()))
+            },
+            onTapReadMore = { baseProductCode ->
+                val params = SnapPlaySearchConditionRouteParams(baseProductCode = baseProductCode)
+                navigator.navigate(ExampleRoute.SSSnapPlayList(params.toQueryString()))
+            },
+            onFavoriteAttemptWithoutLogin = {
+                exampleViewModel.showNeedLoginAlert()
+            },
+        )
+    }
+
+    entry<ExampleRoute.BrandPage> { key ->
+        BrandScreen(
+            key.labelId,
+            useDarkTheme = useDarkTheme,
+            onTapSnapPlay = { snapPlayId ->
+                navigator.navigate(ExampleRoute.SSSnapPlayDetail(snapPlayId.toString()))
+            },
+            onTapReadMoreSnapPlay = { brandSnapPlaysBlockCondition ->
+                val params = brandSnapPlaysBlockCondition.toSnapPlaySearchConditionRouteParams()
+                navigator.navigate(ExampleRoute.SSSnapPlayList(params.toQueryString()))
+            },
+            onTapStaff = { userId ->
+                navigator.navigate(ExampleRoute.SSStaffDetail(userId.toString()))
+            },
+            onTapReadMoreStaff = { brandStaffsBlockCondition ->
+                val params = brandStaffsBlockCondition.toStaffSearchConditionRouteParams()
+                navigator.navigate(ExampleRoute.SSStaffList(params.toQueryString()))
+            },
+        )
+    }
+
+    entry<ExampleRoute.SSSnapPlayList> { key ->
+        val params = SnapPlaySearchConditionRouteParams.fromQueryString(key.queryString)
+        StaffStartSnapPlayListScreen(
+            params,
+            useDarkTheme,
+            onTapSnapPlay = { snapPlayId ->
+                navigator.navigate(ExampleRoute.SSSnapPlayDetail(snapPlayId.toString()))
+            },
+            onFavoriteAttemptWithoutLogin = {
+                exampleViewModel.showNeedLoginAlert()
+            },
+        )
+    }
+
+    entry<ExampleRoute.SSStaffList> { key ->
+        val params = StaffSearchConditionRouteParams.fromQueryString(key.queryString)
+        StaffStartStaffListScreen(
+            params,
+            useDarkTheme,
+            onTapStaff = { staffId ->
+                navigator.navigate(ExampleRoute.SSStaffDetail(staffId.toString()))
+            },
+            onFavoriteAttemptWithoutLogin = {
+                exampleViewModel.showNeedLoginAlert()
+            },
+        )
+    }
+
+    entry<ExampleRoute.SSStaffDetail> { key ->
+        StaffStartStaffDetailScreen(
+            staffId = key.id,
+            useDarkTheme = useDarkTheme,
+            onTapSnapPlay = { snapPlayId ->
+                navigator.navigate(ExampleRoute.SSSnapPlayDetail(snapPlayId.toString()))
+            },
+            onTapSnapPlayFilter = {
+                val params = it.toSnapPlaySearchConditionRouteParams()
+                navigator.navigate(ExampleRoute.SSSnapPlayList(params.toQueryString()))
+            },
+            onFavoriteAttemptWithoutLogin = {
+                exampleViewModel.showNeedLoginAlert()
+            },
+        )
+    }
+
+    entry<ExampleRoute.SSSnapPlayDetail> { key ->
+        StaffStartSnapPlayDetailScreen(
+            snapPlayId = key.id,
+            useDarkTheme = useDarkTheme,
+            onTapSnapPlay = {
+                navigator.navigate(ExampleRoute.SSSnapPlayDetail(it.toString()))
+            },
+            onTapSnapPlayFilter = {
+                val params = it.toSnapPlaySearchConditionRouteParams()
+                navigator.navigate(ExampleRoute.SSSnapPlayList(params.toQueryString()))
+            },
+            onTapProductItem = {
+                navigator.navigate(ExampleRoute.ProductDetail(it))
+            },
+            onTapStaff = {
+                navigator.navigate(ExampleRoute.SSStaffDetail(it.toString()))
+            },
+            onTapSnapPlayNotFoundBack = {
+                navigator.goBack()
+            },
+            onFavoriteAttemptWithoutLogin = {
+                exampleViewModel.showNeedLoginAlert()
+            },
+        )
+    }
+}
+
+@Composable
+private fun NavHostView(
+    modifier: Modifier = Modifier,
+    useDarkTheme: Boolean = false
+) {
+    val navController = rememberNavController()
+    val exampleViewModel = LocalExampleViewModel.current
+
     NavHost(
         modifier = modifier.fillMaxSize(),
         navController = navController,
