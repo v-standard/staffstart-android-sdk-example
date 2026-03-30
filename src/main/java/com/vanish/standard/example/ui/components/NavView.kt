@@ -43,10 +43,10 @@ fun NavView(
     StaffStartUI.Configure(
         StaffStartUIConfiguration(
             onTapProductItem = { productCode ->
-                PlatformLogger.d("Navigation3View.onTapProductItem", productCode)
+                PlatformLogger.d("NavView.onTapProductItem", productCode)
             },
             onShowCoordinateDetail = { snapPlayId ->
-                PlatformLogger.d("Navigation3View.onShowCoordinateDetail", snapPlayId.toString())
+                PlatformLogger.d("NavView.onShowCoordinateDetail", snapPlayId.toString())
 
                 coroutineScope.launch {
                     StaffStartTracking.trackPageView(
