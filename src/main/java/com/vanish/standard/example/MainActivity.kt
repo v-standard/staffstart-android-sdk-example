@@ -94,7 +94,7 @@ class MainActivity : ComponentActivity() {
                                 when (selectedTab) {
                                     MainTab.SNAP ->
                                         when (UNIT_SCREEN_FLAG) {
-                                            true -> NavView(useDarkTheme = useDarkTheme)
+                                            true -> NavView(useDarkTheme = useDarkTheme, useNavigation3 = USE_NAVIGATION_3_FLAG)
                                             false -> TabView(useDarkTheme = useDarkTheme)
                                         }
 
