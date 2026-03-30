@@ -36,6 +36,7 @@ import com.vanish.standard.staffstart.tracking.framework.config.tracking
 import kotlinx.coroutines.launch
 
 private const val UNIT_SCREEN_FLAG = true
+private const val USE_NAVIGATION_3_FLAG = true
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,7 +94,7 @@ class MainActivity : ComponentActivity() {
                                 when (selectedTab) {
                                     MainTab.SNAP ->
                                         when (UNIT_SCREEN_FLAG) {
-                                            true -> NavView(useDarkTheme = useDarkTheme)
+                                            true -> NavView(useDarkTheme = useDarkTheme, useNavigation3 = USE_NAVIGATION_3_FLAG)
                                             false -> TabView(useDarkTheme = useDarkTheme)
                                         }
 
