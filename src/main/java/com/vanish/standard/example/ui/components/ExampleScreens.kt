@@ -137,6 +137,10 @@ fun BrandScreen(
             useDarkTheme = useDarkTheme,
             onTapSnapPlay = onTapSnapPlay,
             onTapReadMoreSnapPlay = onTapReadMoreSnapPlay,
+            onFavoriteAttemptWithoutLogin = {
+                // TODO ログインしていないのにお気に入りしようとした際のcallbackを実装してください
+                exampleViewModel.showNeedLoginAlert()
+            },
         )
 
         BrandSnapPlaysBlockSample(
@@ -153,6 +157,10 @@ fun BrandScreen(
             useDarkTheme = useDarkTheme,
             onTapSnapPlay = onTapSnapPlay,
             onTapReadMoreSnapPlay = onTapReadMoreSnapPlay,
+            onFavoriteAttemptWithoutLogin = {
+                // TODO ログインしていないのにお気に入りしようとした際のcallbackを実装してください
+                exampleViewModel.showNeedLoginAlert()
+            },
         )
 
         BrandSnapPlaysBlockSample(
@@ -168,6 +176,10 @@ fun BrandScreen(
             useDarkTheme = useDarkTheme,
             onTapSnapPlay = onTapSnapPlay,
             onTapReadMoreSnapPlay = onTapReadMoreSnapPlay,
+            onFavoriteAttemptWithoutLogin = {
+                // TODO ログインしていないのにお気に入りしようとした際のcallbackを実装してください
+                exampleViewModel.showNeedLoginAlert()
+            },
         )
 
         HorizontalDivider(modifier = Modifier.padding(top = 20.dp))

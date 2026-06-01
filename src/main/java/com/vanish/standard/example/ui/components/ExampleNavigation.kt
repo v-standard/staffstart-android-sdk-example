@@ -19,48 +19,37 @@ import androidx.navigation3.runtime.serialization.NavKeySerializer
 import androidx.savedstate.compose.serialization.serializers.MutableStateSerializer
 import kotlinx.serialization.Serializable
 import java.util.UUID
-import kotlin.collections.associateWith
-import kotlin.collections.flatMap
-import kotlin.collections.mapValues
-import kotlin.collections.removeLastOrNull
 
 @Serializable
 sealed interface ExampleRoute : NavKey {
-    @Serializable
-    data object Top : ExampleRoute
+    @Serializable data object Top : ExampleRoute
 
-    @Serializable
-    data class ProductDetail(
+    @Serializable data class ProductDetail(
         val baseProductCode: String?,
         val uuid: String = UUID.randomUUID().toString()
     ) : ExampleRoute
 
-    @Serializable
-    data class BrandPage(
+    @Serializable data class BrandPage(
         val labelId: Int,
         val uuid: String = UUID.randomUUID().toString()
     ) : ExampleRoute
 
-    @Serializable
-    data class SSSnapPlayDetail(
+    @Serializable data class SSSnapPlayDetail(
         val id: String,
         val uuid: String = UUID.randomUUID().toString()
     ) : ExampleRoute
 
-    @Serializable
-    data class SSSnapPlayList(
+    @Serializable data class SSSnapPlayList(
         val queryString: String = "",
         val uuid: String = UUID.randomUUID().toString()
     ) : ExampleRoute
 
-    @Serializable
-    data class SSStaffDetail(
+    @Serializable data class SSStaffDetail(
         val id: String,
         val uuid: String = UUID.randomUUID().toString()
     ) : ExampleRoute
 
-    @Serializable
-    data class SSStaffList(
+    @Serializable data class SSStaffList(
         val queryString: String = "",
         val uuid: String = UUID.randomUUID().toString()
     ) : ExampleRoute

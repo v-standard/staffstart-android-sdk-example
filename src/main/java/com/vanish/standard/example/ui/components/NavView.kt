@@ -43,10 +43,10 @@ fun NavView(
     StaffStartUI.Configure(
         StaffStartUIConfiguration(
             onTapProductItem = { productCode ->
-                PlatformLogger.d("NavView.onTapProductItem", productCode)
+                PlatformLogger.d("Navigation3View.onTapProductItem", productCode)
             },
             onShowCoordinateDetail = { snapPlayId ->
-                PlatformLogger.d("NavView.onShowCoordinateDetail", snapPlayId.toString())
+                PlatformLogger.d("Navigation3View.onShowCoordinateDetail", snapPlayId.toString())
 
                 coroutineScope.launch {
                     StaffStartTracking.trackPageView(
@@ -98,15 +98,15 @@ private fun Navigation3View(
         onBack = { navigator.goBack() },
         transitionSpec = {
             (slideInHorizontally { it } + fadeIn()) togetherWith
-                    (slideOutHorizontally { -it / 4 } + fadeOut())
+                (slideOutHorizontally { -it / 4 } + fadeOut())
         },
         popTransitionSpec = {
             (slideInHorizontally { -it / 4 } + fadeIn()) togetherWith
-                    (slideOutHorizontally { it } + fadeOut())
+                (slideOutHorizontally { it } + fadeOut())
         },
         predictivePopTransitionSpec = { _ ->
             (slideInHorizontally { -it / 4 } + fadeIn()) togetherWith
-                    (slideOutHorizontally { it } + fadeOut())
+                (slideOutHorizontally { it } + fadeOut())
         },
     )
 }
