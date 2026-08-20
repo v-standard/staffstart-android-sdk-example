@@ -30,7 +30,6 @@ staffstart-tracking = { module = "com.vanish-standard:staffstart-tracking", vers
 # kotlin
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 
 # ktor client
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
